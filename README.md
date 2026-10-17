@@ -64,6 +64,19 @@ model and accepts optional local feedback.
 For development-only debug mode, set `FLASK_DEBUG=1` before starting the
 application. Debug mode should not be enabled in production.
 
+## Deploy with Render
+
+GitHub hosts the source code, while Render runs the Flask application.
+Create a Render Web Service connected to this repository with:
+
+- **Build command:** `pip install -r requirements.txt`
+- **Start command:** `gunicorn app:app`
+- **Environment:** Python 3
+
+The included model files are loaded from the repository, so no model path
+environment variable is required. The optional NLTK stopwords download is not
+required because the application has a built-in fallback.
+
 ## API endpoints
 
 ### `POST /predict`
