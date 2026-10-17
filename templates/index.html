@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Sentiment Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMfhA8QcXA4FfY1kBw1RM7Sk8ix3acVFD2mrp9" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/static/twitter.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background-color: #0077b6;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .form-box,
+        .results-box,
+        .feedback-box,
+        .login-box {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #0077b6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .form-box:hover,
+        .results-box:hover,
+        .feedback-box:hover,
+        .login-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #textInput, #username, #password {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #0077b6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #005f88;
+            transform: scale(1.05);
+        }
+
+        .results-box {
+            text-align: center;
+        }
+
+        canvas {
+            margin-top: 20px;
+            display: block;
+            max-width: 100%;
+        }
+
+        footer {
+            background-color: #0077b6;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        /* New Styles for the Contact Section */
+        .contact-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .contact-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            width: 250px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-item i {
+            font-size: 24px;
+            color: #0077b6;
+        }
+
+        .contact-item p {
+            margin: 10px 0;
+        }
+
+        .contact-item a {
+            color: #0077b6;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-item a:hover {
+            color: #005f88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="mainPage">
+            <header>
+                <h1><i class="fas fa-chart-line"></i> Twitter Sentiment Analysis</h1>
+                <p>Analyze tweets and explore sentiment trends with AI!</p>
+            </header>
+
+            <main>
+                <!-- Sentiment Analysis Form -->
+                <form id="sentimentForm" class="form-box">
+                    <textarea 
+                        name="text" 
+                        id="textInput" 
+                        placeholder="Enter your tweet here..." 
+                        maxlength="5000"
+                        required></textarea>
+                    <select id="modelSelector">
+                        <option value="logistic_regression">Logistic Regression</option>
+                        <option value="naive_bayes">Naive Bayes</option>
+                    </select>
+                    <button type="submit">Analyze Sentiment</button>
+                    <button type="button" id="clearButton">Clear</button>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="results-box">
+                    Waiting for input...
+                </div>
+
+                <!-- Bar Chart -->
+                <canvas id="sentimentChart" width="400" height="200"></canvas>
+
+                <!-- Feedback Form -->
+                <div class="feedback-box">
+                    <h3>Feedback</h3>
+                    <textarea 
+                        name="feedback" 
+                        id="feedbackInput" 
+                        placeholder="Share your thoughts or suggestions..." 
+                        required></textarea>
+                    <button type="button" id="submitFeedback">Submit Feedback</button>
+                </div>
+
+                <!-- Contact Information Section -->
+                <div class="contact-section">
+                    <div class="contact-item">
+                        <i class="fas fa-info-circle"></i>
+                        <p><strong>About Us</strong></p>
+                        <p><a href="#">Learn more about our sentiment analysis project.</a></p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <p><strong>Email</strong></p>
+                        <p>Use the project repository for questions and suggestions.</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <p><strong>Address</strong></p>
+                        <p>Online educational project</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <p><strong>Phone</strong></p>
+                        <p>Contact information intentionally omitted</p>
+                    </div>
+                </div>
+            </main>
+
+            <footer>
+                <p>&copy; 2024 Twitter Sentiment Analyzer. All rights reserved.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const sentimentForm = document.getElementById('sentimentForm');
+        const feedbackButton = document.getElementById('submitFeedback');
+        const clearButton = document.getElementById('clearButton');
+        const resultsDiv = document.getElementById('results');
+        const feedbackInput = document.getElementById('feedbackInput');
+        const sentimentChart = document.getElementById('sentimentChart').getContext('2d');
+        let chartInstance;
+
+        sentimentForm.onsubmit = async function (e) {
+            e.preventDefault();
+
+            // Get user input and model selection
+            const userInput = document.getElementById('textInput').value;
+            const selectedModel = document.getElementById('modelSelector').value;
+
+            resultsDiv.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing sentiment...`;
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `text=${encodeURIComponent(userInput)}&model=${selectedModel}`
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                resultsDiv.innerHTML = 
+                    `<h3>Results:</h3>
+                    <p><strong>Model:</strong> ${selectedModel.replace('_', ' ').toUpperCase()}</p>
+                    <p><strong>Sentiment:</strong> ${result.sentiment}</p>
+                    <p><strong>Positive Score:</strong> ${result['positive_score']}%</p>
+                    <p><strong>Negative Score:</strong> ${result['negative_score']}%</p>
+                `;
+
+                // Update chart
+                const data = [result.positive_score, result.negative_score];
+                updateChart(data);
+            } else {
+                resultsDiv.innerHTML = `<p style="color: red;">Error analyzing sentiment. Please try again.</p>`;
+            }
+        };
+
+        feedbackButton.onclick = async function () {
+            const feedback = feedbackInput.value;
+
+            if (!feedback) {
+                alert('Please enter feedback!');
+                return;
+            }
+
+            const response = await fetch('/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `feedback=${encodeURIComponent(feedback)}`
+            });
+
+            if (response.ok) {
+                alert('Thank you for your feedback!');
+                feedbackInput.value = '';
+            } else {
+                alert('Failed to submit feedback. Please try again.');
+            }
+        };
+
+        clearButton.onclick = function () {
+            document.getElementById('textInput').value = '';
+            resultsDiv.innerHTML = 'Waiting for input...';
+            feedbackInput.value = '';
+            updateChart([0, 0]);
+        };
+
+        function updateChart(data) {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(sentimentChart, {
+                type: 'bar',
+                data: {
+                    labels: ['Positive', 'Negative'],
+                    datasets: [{
+                        label: 'Sentiment Scores',
+                        data: data,
+                        backgroundColor: ['#4caf50', '#f44336']
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
